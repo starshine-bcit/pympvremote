@@ -37,6 +37,4 @@ class Requester():
             'Content-Type': 'text/xml'
         }
         response = self.session.post(f'{self.server}/stream', files=files)
-        print(response.text)
-        print(str(base64.urlsafe_b64decode(response.text), 'utf-8'))
-        return response
+        return self.play(response.text)
