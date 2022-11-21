@@ -14,3 +14,6 @@ pyvenv.cfg
 Lib/
 Include/
 Scripts/
+
+# Project
+certs/
