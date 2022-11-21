@@ -10,5 +10,10 @@ LOG_LEVEL = 'info'
 # Client Settings
 
 
+# Player Settings
+FULLSCREEN = False
+ON_TOP = False
+
+
 if __name__ == '__main__':
     pass
