@@ -12,8 +12,8 @@ class Requester():
         self.session.verify = False
         self.server = SERVER
 
-    def play(self, uri: str) -> requests.Response:
-        return self.session.post(f'{self.server}/play?uri={uri}')
+    def play(self, uri: str, replace: bool) -> requests.Response:
+        return self.session.post(f'{self.server}/play?uri={uri}&replace={replace}')
 
     def playtest(self) -> requests.Response:
         return self.session.post(self.server + '/playtest')
@@ -30,14 +30,14 @@ class Requester():
     def unpause(self) -> requests.Response:
         return self.session.post(self.server + '/unpause')
 
-    def stream(self, file: Path) -> requests.Response:
+    def stream(self, file: Path, replace: bool) -> requests.Response:
         files = {
             'file': file.open('rb'),
             'Content-Disposition': 'form-data; name="file"; filename="' + str(file) + '"',
             'Content-Type': 'text/xml'
         }
         response = self.session.post(f'{self.server}/stream', files=files)
-        return self.play(response.text)
+        return self.play(response.text, replace=replace)
 
     def encode_uri(self, uri: str) -> str:
         return str(base64.urlsafe_b64encode(

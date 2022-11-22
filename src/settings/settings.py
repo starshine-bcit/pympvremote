@@ -7,12 +7,13 @@ TEMP_DIR = Path('./~temp')
 LISTEN_PORT = 5555
 LOG_LEVEL = 'info'
 
-# Client Settings
-
 
 # Player Settings
 FULLSCREEN = False
 ON_TOP = False
+
+
+# Client Settings
 
 
 if __name__ == '__main__':

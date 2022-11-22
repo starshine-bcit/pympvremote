@@ -17,5 +17,10 @@ def get_player_status(player: MPV):
 
 
 def create_player():
-    player = MPV(ytdl=True, fullscreen=FULLSCREEN, ontop=ON_TOP)
+    player = MPV(
+        ytdl=True,
+        fullscreen=FULLSCREEN,
+        ontop=ON_TOP,
+        osc=False
+    )
     return player
