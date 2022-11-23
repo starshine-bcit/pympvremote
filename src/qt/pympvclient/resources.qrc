@@ -1,0 +1,6 @@
+<RCC>
+    <qresource lang="en" prefix="/icons">
+        <file>assets/candy.png</file>
+        <file>assets/candy.svg</file>
+    </qresource>
+</RCC>

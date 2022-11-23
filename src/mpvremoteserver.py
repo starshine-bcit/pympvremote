@@ -7,11 +7,8 @@ import uvicorn
 
 from src.settings.settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
 
-testvid = Path('C:\\Courses\\2515\\testvids\\production ID_3756003.mp4')
-
 RELOAD_DIRS = ['./modules']
 RELOAD = True
-Test = False
 
 def check_temp():
     if TEMP_DIR.is_dir():
