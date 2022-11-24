@@ -2,20 +2,22 @@
 
 import sys
 import asyncio
-import time
 from pathlib import Path
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtWidgets
 
+from src.qt.client_main_ui import ClientMain
+from src.settings.client_settings import SERVER
 from src.modules.requester import Requester
-from src.modules.form import Ui_MainWindow
-import src.modules.resources
-# pyside6-rcc reources.qrc | sed '0,/PySide6/s//PyQt6/' > resources.py  
+
+# To compile resources from qrc
+# pyside6-rcc resources.qrc | sed '0,/PySide6/s//PyQt6/' > resources.py  
 
 TEST_FILE = Path('C:\\Courses\\2515\\testvids\\production ID_3756003.mp4')
 TEST_FILE_LARGER= Path('C:\\Courses\\2515\\testvids\\Commands Prompt Commands Everybody Should Know [iXprT0ltnVg].webm')
 
 async def stats(requester: Requester):
+# maybe put this in ui class?
     while True:
         await asyncio.sleep(1)
         response = requester.status()
@@ -27,7 +29,7 @@ async def stats(requester: Requester):
 
 
 # async def main():
-#     requester = Requester()
+#     requester = Requester(SERVER)
 #     test_uri = 'https://www.youtube.com/watch?v=rSc9xYPMAQY'
 #     test_yt = requester.encode_uri(test_uri)
 #     test_local = requester.encode_uri(str(TEST_FILE))
@@ -58,20 +60,15 @@ async def stats(requester: Requester):
 #     # time.sleep(15)
 #     # response = requester.stop()
 
-class FormWindow(Ui_MainWindow):
-    def __init__(self):
-        super().__init__()
+
 
 def main():
-
     app = QtWidgets.QApplication([])
-    MainWindow = QtWidgets.QMainWindow()
-    ui = FormWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    main_window = QtWidgets.QMainWindow()
+    requester = Requester(SERVER)
+    ui = ClientMain(main_window, requester)
+    main_window.show()
     sys.exit(app.exec())
-
 
 if __name__ == '__main__':
     main()
-    # asyncio.run(main())

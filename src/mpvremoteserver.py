@@ -5,12 +5,13 @@ import shutil
 
 import uvicorn
 
-from src.settings.settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
+from src.settings.server_settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
 
-RELOAD_DIRS = ['./modules']
-RELOAD = True
 
-def check_temp():
+def check_temp() -> None:
+    """Creates Temp directory to store uploaded files.
+        The directory is deleted on each relaunch of the program.
+    """
     if TEMP_DIR.is_dir():
         shutil.rmtree(TEMP_DIR)
     elif TEMP_DIR.is_file():
@@ -22,9 +23,7 @@ def main():
     check_temp()
     config = uvicorn.Config('modules.mpvapi:app',
                             port=LISTEN_PORT,
-                            log_level=LOG_LEVEL,
-                            reload=RELOAD,
-                            reload_dirs=RELOAD_DIRS)
+                            log_level=LOG_LEVEL)
     server = uvicorn.Server(config)
     server.run()
 

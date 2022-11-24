@@ -1,19 +1,19 @@
 
-import base64
 from pathlib import Path
 import requests
 from requests.exceptions import HTTPError
 
-from src.settings.settings import SERVER
+from src.modules.b64_helper import encode_uri, decode_uri
 
 class Requester():
-    def __init__(self) -> None:
+    def __init__(self, server: str) -> None:
         self.session = requests.Session()
         self.session.verify = False
-        self.server = SERVER
+        self.server = server
 
-    def play(self, uri: str, replace: bool) -> requests.Response:
-        return self.session.post(f'{self.server}/play?uri={uri}&replace={replace}')
+    def play(self, uri: str, local: bool, replace: bool) -> requests.Response:
+        encoded_uri = encode_uri(uri)
+        return self.session.post(f'{self.server}/play?uri={encoded_uri}&replace={replace}&local={local}')
 
     def playtest(self) -> requests.Response:
         return self.session.post(self.server + '/playtest')
@@ -36,9 +36,31 @@ class Requester():
             'Content-Disposition': 'form-data; name="file"; filename="' + str(file) + '"',
             'Content-Type': 'text/xml'
         }
-        response = self.session.post(f'{self.server}/stream', files=files)
-        return self.play(response.text, replace=replace)
+        res = self.session.post(f'{self.server}/stream', files=files).json()
+        return self.play(res.get('file'), local=True, replace=replace)
+    
+    def list(self) -> requests.Response:
+        return self.session.get(self.server + '/list')
 
-    def encode_uri(self, uri: str) -> str:
-        return str(base64.urlsafe_b64encode(
-        bytes(uri, encoding='utf-8')), 'utf-8')
+    def upload(self, file: Path) -> requests.Response:
+        files = {
+            'file': file.open('rb'),
+            'Content-Disposition': 'form-data; name="file"; filename="' + str(file) + '"',
+            'Content-Type': 'text/xml'
+        }
+        return self.session.post(f'{self.server}/upload', files=files)
+
+    def mute(self) -> requests.Response:
+        return self.session.post(self.server + '/mute')
+
+    def fullscreen(self) -> requests.Response:
+        return self.session.post(self.server + '/fullscreen')
+
+    def repeat(self) -> requests.Response:
+        return self.session.post(self.server + '/repeat')
+
+    def seek(self, percent: float) -> requests.Response:
+        return self.session.post(f'{self.server}/seek?percent_pos={percent}')
+
+if __name__ == '__main__':
+    pass

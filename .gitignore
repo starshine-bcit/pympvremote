@@ -19,3 +19,5 @@ Scripts/
 certs/
 ~temp/
 src/properties.json
+.urls
+media/*
