@@ -6,6 +6,7 @@ from requests.exceptions import HTTPError
 
 from src.modules.b64_helper import encode_uri, decode_uri
 
+
 class Requester():
     def __init__(self, server: str) -> None:
         self.session = requests.Session()
@@ -18,7 +19,7 @@ class Requester():
 
     def playtest(self) -> requests.Response:
         return self.session.post(self.server + '/playtest')
-    
+
     def stop(self) -> requests.Response:
         return self.session.post(self.server + '/stop')
 
@@ -27,7 +28,7 @@ class Requester():
 
     def pause(self) -> requests.Response:
         return self.session.post(self.server + '/pause')
-    
+
     def unpause(self) -> requests.Response:
         return self.session.post(self.server + '/unpause')
 
@@ -39,7 +40,7 @@ class Requester():
         }
         res = self.session.post(f'{self.server}/stream', files=files).json()
         return self.play(res.get('file'), local=True, replace=replace)
-    
+
     def flist(self) -> requests.Response:
         return self.session.get(self.server + '/list')
 
@@ -69,15 +70,16 @@ class Requester():
     def playlist(self, plist: list[str], new: bool, index: int) -> requests.Response:
         plist_json = json.dumps({'plist': plist, 'new': new, 'index': index})
         return self.session.post(f'{self.server}/playlist', data=plist_json, headers={'Content-type': 'application/json', 'Accept': 'application/json'})
-    
+
     def next(self):
         return self.session.post(self.server + '/next')
-    
+
     def previous(self):
         return self.session.post(self.server + '/previous')
 
     def play_index(self, index: int):
         return self.session.post(f'{self.server}/playindex?index={index}')
+
 
 if __name__ == '__main__':
     pass

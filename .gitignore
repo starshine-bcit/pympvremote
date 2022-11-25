@@ -17,7 +17,7 @@ Scripts/
 
 # Project
 certs/
-~temp/
+.temp_pympvremotefiles/
 src/properties.json
 .urls
 media/*

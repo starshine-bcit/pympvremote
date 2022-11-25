@@ -109,7 +109,7 @@ class ClientMain(Ui_MainWindow):
         if len(res_files) > 0:
             for file in res_files:
                 self.listWidgetRemoteFiles.addItem(QtWidgets.QListWidgetItem(file))
-        self.temp_status_message(res)
+            self.temp_status_message(res)
 
     def toggle_pause(self) -> None:
         res = self.requester.pause().json()

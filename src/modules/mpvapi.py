@@ -1,9 +1,7 @@
-import base64
 from pathlib import Path
 import time
-import json
 
-from fastapi import FastAPI, UploadFile, File, Response, Request
+from fastapi import FastAPI, UploadFile, File, Response
 from fastapi import status as fast_status
 import aiofiles
 
@@ -12,10 +10,22 @@ from src.settings.server_settings import TEMP_DIR, MEDIA_DIR
 from src.modules.mpvplayer import Player
 from src.modules.b64_helper import encode_uri, decode_uri
 
+# how to stream data from python to mpv
+#     @player.python_stream('stream')
+#     def stream_helper():
+#         with open(testfile, 'rb') as tfile:
+#             while True:
+#                 yield tfile.read(1024*1024)
+
+#     player.loadfile('python://stream', 'replace')
+#     player.wait_until_playing()
+#     return {'message': 'playing test file now'}
+
 
 player_instance = Player()
 player = player_instance.get_player()
 app = FastAPI()
+
 
 @app.post("/play", status_code=fast_status.HTTP_200_OK)
 def play(uri: str, local: bool, replace: bool, response: Response):
@@ -48,6 +58,7 @@ def stop(response: Response):
         response.status_code = fast_status.HTTP_406_NOT_ACCEPTABLE
         return {'message': 'playback could not be stopped - nothing was playing'}
 
+
 @app.post("/mute")
 def mute():
     if player.mute:
@@ -56,6 +67,7 @@ def mute():
     else:
         player.command('set', 'mute', 'yes')
         return {'message': 'player muted'}
+
 
 @app.post("/fullscreen")
 def fullscreen():
@@ -66,6 +78,7 @@ def fullscreen():
         player.command('set', 'fullscreen', 'yes')
         return {'message': 'toggled fullscreen on'}
 
+
 @app.post("/repeat")
 def repeat():
     if player.loop_playlist:
@@ -74,22 +87,6 @@ def repeat():
     else:
         player.command('set', 'loop-playlist', 'inf')
         return {'message': 'toggled repeat on'}
-
-
-# @app.post("/playtest")
-# async def playtest():
-#     testfile = Path(
-#         'x')
-
-#     @player.python_stream('stream')
-#     def stream_helper():
-#         with open(testfile, 'rb') as tfile:
-#             while True:
-#                 yield tfile.read(1024*1024)
-
-#     player.loadfile('python://stream', 'replace')
-#     player.wait_until_playing()
-#     return {'message': 'playing test file now'}
 
 
 @app.get("/status")
@@ -123,6 +120,7 @@ async def stream(file: UploadFile, response: Response):
             await out_file.write(content)
     return {'message': 'file uploaded successfully, playing', 'file': str(tempfile.resolve())}
 
+
 @app.post('/upload/', status_code=fast_status.HTTP_201_CREATED)
 async def upload(file: UploadFile, response: Response):
     newfile = Path(MEDIA_DIR, file.filename)
@@ -135,26 +133,32 @@ async def upload(file: UploadFile, response: Response):
         response.status_code = fast_status.HTTP_406_NOT_ACCEPTABLE
         return {'message': f'file {file.filename} already exists'}
 
+
 @app.get('/list', status_code=fast_status.HTTP_200_OK)
 def list_files(response: Response):
-    file_list = [str(x.stem + x.suffix) for x in MEDIA_DIR.glob('*') if x.is_file()]
+    print(MEDIA_DIR)
+    file_list = [str(x.stem + x.suffix)
+                 for x in MEDIA_DIR.glob('*') if x.is_file()]
     if len(file_list) > 0:
         return {'message': 'successfully listed files', 'files': file_list}
     else:
         response.status_code = fast_status.HTTP_204_NO_CONTENT
         return {'message': 'no remote files to list', 'files': []}
 
+
 @app.post('/volume')
 def volume(volume: int):
     player.command('set', 'volume', volume)
     return {'message': f'volume set to {volume}'}
+
 
 @app.post('/playlist/')
 def playlist(data: PlaylistItem):
     if data.new:
         if player.playlist_pos > -1:  # type: ignore
             player.stop()
-        parsed_list = [x if x[:4] == 'http' else str(Path(MEDIA_DIR, x).resolve()) for x in data.plist]
+        parsed_list = [x if x[:4] == 'http' else str(
+            Path(MEDIA_DIR, x).resolve()) for x in data.plist]
         player.playlist_clear()
         for item in parsed_list:
             player.playlist_append(item)
@@ -163,10 +167,12 @@ def playlist(data: PlaylistItem):
         print(player.playlist_pos)
         return {'message': f'playing playlist starting at index {data.index}'}
 
+
 @app.post('/next')
 def next():
     player.playlist_next()
     return {'message': 'playing next playlist item'}
+
 
 @app.post('/previous')
 def previous():

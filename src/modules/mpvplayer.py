@@ -3,6 +3,7 @@ from src.modules.mpv import MPV
 
 from src.settings.server_settings import FULLSCREEN, ON_TOP
 
+
 class Player():
     def __init__(self) -> None:
         self.fullscreen = FULLSCREEN
@@ -32,6 +33,7 @@ class Player():
             'volume': self.player.volume,
             'playlist-pos': self.player.playlist_pos
         }
+
 
 if __name__ == '__main__':
     pass
