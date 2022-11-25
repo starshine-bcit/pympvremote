@@ -143,7 +143,7 @@ def list_files(response: Response):
         return {'message': 'successfully listed files', 'files': file_list}
     else:
         response.status_code = fast_status.HTTP_204_NO_CONTENT
-        return {'message': 'no remote files to list', 'files': []}
+        return {'message': 'no remote files to list'}
 
 
 @app.post('/volume')

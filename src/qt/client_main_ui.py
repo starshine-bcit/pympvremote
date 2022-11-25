@@ -105,13 +105,15 @@ class ClientMain(Ui_MainWindow):
         self.temp_status_message(res)
 
     def get_remote_file_list(self) -> None:
-        res = self.requester.flist().json()
-        self.listWidgetRemoteFiles.clear()
-        res_files = res.get('files')
-        if len(res_files) > 0:
-            for file in res_files:
-                self.listWidgetRemoteFiles.addItem(QtWidgets.QListWidgetItem(file))
-            self.temp_status_message(res)
+        res_full = self.requester.flist()
+        if res_full.status_code == 200:
+            res = res_full.json()
+            self.listWidgetRemoteFiles.clear()
+            res_files = res.get('files')
+            if len(res_files) > 0:
+                for file in res_files:
+                    self.listWidgetRemoteFiles.addItem(QtWidgets.QListWidgetItem(file))
+                self.temp_status_message(res)
 
     def toggle_pause(self) -> None:
         res = self.requester.pause().json()

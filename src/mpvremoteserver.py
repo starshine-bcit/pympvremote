@@ -5,7 +5,7 @@ import shutil
 
 import uvicorn
 
-from settings.server_settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
+from settings.server_settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL, MEDIA_DIR
 
 
 def check_temp() -> None:
@@ -17,6 +17,10 @@ def check_temp() -> None:
     elif TEMP_DIR.is_file():
         Path.unlink(TEMP_DIR)
     TEMP_DIR.mkdir()
+
+def check_media() -> None:
+    if not MEDIA_DIR.is_dir():
+        MEDIA_DIR.mkdir()
 
 
 def main():
