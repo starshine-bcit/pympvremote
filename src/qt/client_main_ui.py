@@ -9,6 +9,7 @@ from src.qt.main_window import Ui_MainWindow
 from src.modules.requester import Requester
 import src.qt.resources
 
+# to compile .ui modules into python
 # pyuic6 -x -o ..\main_window.py .\mainwindow.ui
 
 class ClientMain(Ui_MainWindow):
@@ -21,6 +22,7 @@ class ClientMain(Ui_MainWindow):
         self.get_stats_timer = QtCore.QTimer()
         self.get_stats_timer.setInterval(1000)
         self.setupUi(self.mw)
+        self.tabWidget.setCurrentIndex(0)
         self.init_status_bar()
         self.load_urls_and_populate()
         self.connect_events()
@@ -42,7 +44,7 @@ class ClientMain(Ui_MainWindow):
         self.actionMute.triggered.connect(self.toggle_mute)
         self.actionFullscreen.triggered.connect(self.toggle_fullscreen)
         self.actionRepeat.triggered.connect(self.toggle_repeat)
-        self.get_stats_timer.timeout.connect(self.get_stats_while_playing)
+        self.get_stats_timer.timeout.connect(self.get_stats_callback)
         self.horizontalSliderPlayBack.sliderReleased.connect(self.seek_to_pos)
         self.actionClear.triggered.connect(self.clear_playlist)
         self.actionAppend.triggered.connect(self.append_to_playlist)
@@ -191,7 +193,7 @@ class ClientMain(Ui_MainWindow):
         self.horizontalSliderPlayBack.setEnabled(True)
         return res
 
-    def get_stats_while_playing(self) -> None:
+    def get_stats_callback(self) -> None:
         res = self.requester.status().json()
         if res.get('filename') is None:
             self.get_stats_timer.stop()
@@ -204,7 +206,7 @@ class ClientMain(Ui_MainWindow):
                 self.horizontalSliderPlayBack.setSliderPosition(int(res.get('percent-pos')))
         plist_length = len(res.get('playlist-names'))
         plist_pos = res.get('playlist-pos')
-        if plist_length > 1:
+        if plist_length > 1 and res.get('filename') is not None:
             self.listWidgetPlaylist.item(plist_pos).setSelected(True)
             if plist_pos < plist_length:
                 self.actionNext.setEnabled(True)
@@ -214,6 +216,9 @@ class ClientMain(Ui_MainWindow):
                 self.actionPrevious.setEnabled(True)
             else:
                 self.actionPrevious.setEnabled(False)
+        if res.get('filename') is None:
+            self.actionNext.setEnabled(False)
+            self.actionPrevious.setEnabled(False)
         print(res)
     
     def seek_to_pos(self) -> None:

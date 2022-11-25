@@ -8,7 +8,7 @@ import aiofiles
 from src.modules.data_models import PlaylistItem
 from src.settings.server_settings import TEMP_DIR, MEDIA_DIR
 from src.modules.mpvplayer import Player
-from src.modules.b64_helper import encode_uri, decode_uri
+from src.modules.b64_helper import decode_uri
 
 # how to stream data from python to mpv
 #     @player.python_stream('stream')
