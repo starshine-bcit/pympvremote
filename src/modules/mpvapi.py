@@ -1,11 +1,13 @@
 import base64
 from pathlib import Path
 import time
+import json
 
-from fastapi import FastAPI, UploadFile, File, Response
+from fastapi import FastAPI, UploadFile, File, Response, Request
 from fastapi import status as fast_status
 import aiofiles
 
+from src.modules.data_models import PlaylistItem
 from src.settings.server_settings import TEMP_DIR, MEDIA_DIR
 from src.modules.mpvplayer import Player
 from src.modules.b64_helper import encode_uri, decode_uri
@@ -119,7 +121,7 @@ async def stream(file: UploadFile, response: Response):
     async with aiofiles.open(tempfile, 'wb') as out_file:
         while content := await file.read(1024):
             await out_file.write(content)
-    return {'message': 'file uploaded successfully', 'file': str(tempfile.resolve())}
+    return {'message': 'file uploaded successfully, playing', 'file': str(tempfile.resolve())}
 
 @app.post('/upload/', status_code=fast_status.HTTP_201_CREATED)
 async def upload(file: UploadFile, response: Response):
@@ -141,6 +143,35 @@ def list_files(response: Response):
     else:
         response.status_code = fast_status.HTTP_204_NO_CONTENT
         return {'message': 'no remote files to list', 'files': []}
+
+@app.post('/volume')
+def volume(volume: int):
+    player.command('set', 'volume', volume)
+    return {'message': f'volume set to {volume}'}
+
+@app.post('/playlist/')
+def playlist(data: PlaylistItem):
+    if data.new:
+        if player.playlist_pos > -1:  # type: ignore
+            player.stop()
+        parsed_list = [x if x[:4] == 'http' else str(Path(MEDIA_DIR, x).resolve()) for x in data.plist]
+        player.playlist_clear()
+        for item in parsed_list:
+            player.playlist_append(item)
+        player.playlist_play_index(data.index)
+        player.wait_until_playing()
+        print(player.playlist_pos)
+        return {'message': f'playing playlist starting at index {data.index}'}
+
+@app.post('/next')
+def next():
+    player.playlist_next()
+    return {'message': 'playing next playlist item'}
+
+@app.post('/previous')
+def previous():
+    player.playlist_prev()
+    return {'message': 'playing previous playlist item'}
 
 
 if __name__ == '__main__':

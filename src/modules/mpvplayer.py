@@ -28,7 +28,9 @@ class Player():
             'playlist-names': self.player.playlist_filenames,
             'mute': self.player.mute,
             'fullscreen': self.player.fullscreen,
-            'repeat': self.player.loop_playlist
+            'repeat': self.player.loop_playlist,
+            'volume': self.player.volume,
+            'playlist-pos': self.player.playlist_pos
         }
 
 if __name__ == '__main__':

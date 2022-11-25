@@ -1,4 +1,5 @@
 
+import json
 from pathlib import Path
 import requests
 from requests.exceptions import HTTPError
@@ -39,7 +40,7 @@ class Requester():
         res = self.session.post(f'{self.server}/stream', files=files).json()
         return self.play(res.get('file'), local=True, replace=replace)
     
-    def list(self) -> requests.Response:
+    def flist(self) -> requests.Response:
         return self.session.get(self.server + '/list')
 
     def upload(self, file: Path) -> requests.Response:
@@ -61,6 +62,22 @@ class Requester():
 
     def seek(self, percent: float) -> requests.Response:
         return self.session.post(f'{self.server}/seek?percent_pos={percent}')
+
+    def volume(self, volume: int) -> requests.Response:
+        return self.session.post(f'{self.server}/volume?volume={volume}')
+
+    def playlist(self, plist: list[str], new: bool, index: int) -> requests.Response:
+        plist_json = json.dumps({'plist': plist, 'new': new, 'index': index})
+        return self.session.post(f'{self.server}/playlist', data=plist_json, headers={'Content-type': 'application/json', 'Accept': 'application/json'})
+    
+    def next(self):
+        return self.session.post(self.server + '/next')
+    
+    def previous(self):
+        return self.session.post(self.server + '/previous')
+
+    def play_index(self, index: int):
+        return self.session.post(f'{self.server}/playindex?index={index}')
 
 if __name__ == '__main__':
     pass
