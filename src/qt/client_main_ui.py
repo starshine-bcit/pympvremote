@@ -4,10 +4,10 @@ from pathlib import Path
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
-from pympvremote.src.modules.file_io import save_urls, load_urls
-from pympvremote.src.qt.main_window import Ui_MainWindow
-from pympvremote.src.modules.requester import Requester
-import pympvremote.src.qt.resources
+from src.modules.file_io import save_urls, load_urls
+from .main_window import Ui_MainWindow
+from src.modules.requester import Requester
+import src.qt.resources
 
 # to compile .ui modules into python
 # pyuic6 -x -o ..\main_window.py .\mainwindow.ui

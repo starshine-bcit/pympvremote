@@ -4,7 +4,7 @@ from pathlib import Path
 import requests
 from requests.exceptions import HTTPError
 
-from pympvremote.src.modules.b64_helper import encode_uri, decode_uri
+from .b64_helper import encode_uri
 
 
 class Requester():
