@@ -4,9 +4,9 @@ import sys
 
 from PyQt6 import QtWidgets
 
-from src.qt.client_main_ui import ClientMain
-from src.settings.client_settings import SERVER
-from src.modules.requester import Requester
+from qt.client_main_ui import ClientMain
+from settings.client_settings import SERVER
+from modules.requester import Requester
 
 # To compile resources from qrc
 # pyside6-rcc resources.qrc | sed '0,/PySide6/s//PyQt6/' > resources.py

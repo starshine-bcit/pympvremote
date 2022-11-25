@@ -1,7 +1,7 @@
 
 from .mpv import MPV
 
-from src.settings.server_settings import FULLSCREEN, ON_TOP
+from settings.server_settings import FULLSCREEN, ON_TOP
 
 
 class Player():

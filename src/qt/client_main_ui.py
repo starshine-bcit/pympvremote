@@ -4,10 +4,10 @@ from pathlib import Path
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
-from src.modules.file_io import save_urls, load_urls
-from .main_window import Ui_MainWindow
-from src.modules.requester import Requester
-import src.qt.resources
+from modules.file_io import save_urls, load_urls
+from modules.requester import Requester
+from qt.main_window import Ui_MainWindow
+import qt.resources
 
 # to compile .ui modules into python
 # pyuic6 -x -o ..\main_window.py .\mainwindow.ui

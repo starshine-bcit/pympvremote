@@ -5,7 +5,7 @@ import shutil
 
 import uvicorn
 
-from src.settings.server_settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
+from settings.server_settings import LISTEN_PORT, TEMP_DIR, LOG_LEVEL
 
 
 def check_temp() -> None:
