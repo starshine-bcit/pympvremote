@@ -1,7 +1,7 @@
 
-from src.modules.mpv import MPV
+from pympvremote.src.modules.mpv import MPV
 
-from src.settings.server_settings import FULLSCREEN, ON_TOP
+from pympvremote.src.settings.server_settings import FULLSCREEN, ON_TOP
 
 
 class Player():
