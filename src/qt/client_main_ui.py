@@ -204,7 +204,7 @@ class ClientMain(Ui_MainWindow):
         elif res.get('pause'):
             self.get_stats_timer.stop()
         else:
-            if not self.horizontalSliderPlayBack.isSliderDown():
+            if not self.horizontalSliderPlayBack.isSliderDown() and res.get('percent-pos') is not None:
                 self.horizontalSliderPlayBack.setSliderPosition(int(res.get('percent-pos')))
         plist_length = len(res.get('playlist-names'))
         plist_pos = res.get('playlist-pos')
