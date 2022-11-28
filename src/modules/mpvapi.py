@@ -26,6 +26,7 @@ player_instance = Player()
 player = player_instance.get_player()
 app = FastAPI()
 
+# documentation for methods can be viewed by visiting '/docs' in your browser
 
 @app.post("/play", status_code=fast_status.HTTP_200_OK, response_model=GenericItem)
 def play(uri: str, local: bool, replace: bool, response: Response):  
