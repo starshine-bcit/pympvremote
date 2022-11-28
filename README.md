@@ -62,9 +62,28 @@ This was put together fairly quickly, but I plan to include more features when t
 
 ### Usage
 
+#### Starting
+
 1. Start the server `python3 ./src/mpvremoteserver.py`. Use `python` if on Windows. You should see uvicorn's info-level messages by default, telling you the server has started.
 2. Start the client `python3 ./src/mpvremoteclient.py`. Use `python` if on Windows. The GUI will load up as long as it is able to connect to the server.
-3. ...
+
+#### Operation
+
+![mpvremoteclient main window](https://i.ibb.co/yYt2ky6/mpvclient-main.png)
+
+- All buttons have tooltips which describes their function
+- Files can be played by double clicking on any of the list items
+- The play button starts the playlist you've created at the first item
+- You can paste a space separated list of URLs in the URLs tab, these will be persisted on your client machine
+- Once a file is playing, the large horizontal scrollbar can be used to seek within the file
+- Toolbars can be dragged to any side of the window, if you don't like the  default position
+- Uploaded files are stored in the server's media directory, while 'streamed' files are cleared on each restart
+
+## Known Issues
+
+- Client will crash upon request exceptions (fix in the works)
+- Streaming for certain high defition files does not work as well as expected
+- There is no way to easily reorder playlist items
 
 ## Acknowledgements
 
