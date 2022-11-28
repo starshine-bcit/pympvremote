@@ -7,10 +7,11 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from modules.file_io import save_urls, load_urls
 from modules.requester import Requester
 from qt.main_window import Ui_MainWindow
+from qt.upload_worker import UploadWorker
 import qt.resources
 
 # to compile .ui modules into python
-# pyuic6 -x -o ..\main_window.py .\mainwindow.ui
+# pyuic6 -o ..\main_window.py .\mainwindow.ui
 
 class ClientMain(Ui_MainWindow):
     def __init__(self, main_window: QtWidgets.QMainWindow, requester: Requester):
@@ -22,6 +23,7 @@ class ClientMain(Ui_MainWindow):
         self.get_stats_timer = QtCore.QTimer()
         self.get_stats_timer.setInterval(1000)
         self.setupUi(self.mw)
+        self.thread_pool = QtCore.QThreadPool()
         self.tabWidget.setCurrentIndex(0)
         self.init_status_bar()
         self.load_urls_and_populate()
@@ -29,6 +31,7 @@ class ClientMain(Ui_MainWindow):
         self.get_remote_file_list()
         self.get_initial_player_state()
         self.init_file_chooser()
+        
 
     def connect_events(self) -> None:
         self.commandLinkButtonAppendURL.clicked.connect(self.add_url_list)
@@ -62,7 +65,6 @@ class ClientMain(Ui_MainWindow):
 
     def get_initial_player_state(self) -> None:
         res = self.requester.status().json()
-        print(res)
         if res.get('mute'):
             self.actionMute.setChecked(True)
         if res.get('fullscreen'):
@@ -71,12 +73,13 @@ class ClientMain(Ui_MainWindow):
             self.actionRepeat.setChecked(True)
         if res.get('filename') is None:
             self.horizontalSliderPlayBack.setEnabled(False)
-        if len(res.get('playlist-names')) > 0:
-            self.rebuild_playlist(res.get('playlist-names'))
+        if len(res.get('playlist_names')) > 0:
+            self.rebuild_playlist(res.get('playlist_names'))
         else:
             self.actionNext.setEnabled(False)
             self.actionPrevious.setEnabled(False)
-        self.labelPermStatusBar.setText('Idle')
+        self.actionPause.setEnabled(False)
+        self.labelPermStatusBar.setText('Volume')
         self.horizontalSliderVolume.setSliderPosition(int(res.get('volume')))
         self.statusbar.showMessage('successfully connected to server')
 
@@ -116,16 +119,23 @@ class ClientMain(Ui_MainWindow):
                 self.temp_status_message(res)
 
     def toggle_pause(self) -> None:
-        res = self.requester.pause().json()
-        if not self.actionPause.isChecked():
-            self.get_stats_timer.start()
+        res_full = self.requester.pause()
+        if res_full.status_code == 200:
+            res = res_full.json()
+            if not self.actionPause.isChecked():
+                self.get_stats_timer.start()
+            self.temp_status_message(res)
+
+    def upload_callback(self, res) -> None:
+        res = res.json()
         self.temp_status_message(res)
 
     def upload_file(self) -> None:
         selected_file = Path(self.file_chooser.getOpenFileName(self.mw, filter=self.media_filter)[0])
         if Path(selected_file).is_file():
-            res = self.requester.upload(selected_file).json()
-            self.temp_status_message(res)
+            worker = UploadWorker(self.requester.upload, selected_file)
+            worker.signals.result.connect(self.upload_callback)
+            self.thread_pool.start(worker)
 
     def exit_program(self) -> None:
         self.stop_playing()
@@ -179,13 +189,20 @@ class ClientMain(Ui_MainWindow):
         res = self.play_single(curr_file, local=True, replace=True)
         self.temp_status_message(res)
 
+    def stream_callback(self, res) -> None:
+        res = res.json()
+        self.temp_status_message(res)
+        self.get_stats_timer.start()
+        self.actionPause.setChecked(False)
+        self.temp_status_message(res)
+
     def choose_file_and_stream(self) -> None:
         selected_file = Path(self.file_chooser.getOpenFileName(self.mw, filter=self.media_filter)[0])
         if Path(selected_file).is_file():
-            res = self.requester.stream(selected_file, replace=True).json()
-            self.get_stats_timer.start()
-            self.actionPause.setChecked(False)
-            self.temp_status_message(res)
+            worker = UploadWorker(self.requester.stream, selected_file)
+            worker.signals.result.connect(self.stream_callback)
+            self.thread_pool.start(worker)
+
 
     def play_single(self, uri: str, replace: bool, local: bool):
         res = self.requester.play(uri, local=local, replace=replace).json()
@@ -201,13 +218,16 @@ class ClientMain(Ui_MainWindow):
             self.get_stats_timer.stop()
             self.horizontalSliderPlayBack.setEnabled(False)
             self.horizontalSliderPlayBack.setSliderPosition(0)
+            self.actionPause.setEnabled(False)
+            self.actionPause.setChecked(False)
         elif res.get('pause'):
             self.get_stats_timer.stop()
         else:
-            if not self.horizontalSliderPlayBack.isSliderDown() and res.get('percent-pos') is not None:
-                self.horizontalSliderPlayBack.setSliderPosition(int(res.get('percent-pos')))
-        plist_length = len(res.get('playlist-names'))
-        plist_pos = res.get('playlist-pos')
+            if not self.horizontalSliderPlayBack.isSliderDown() and res.get('percent_pos') is not None:
+                self.horizontalSliderPlayBack.setSliderPosition(int(res.get('percent_pos')))
+            self.actionPause.setEnabled(True)
+        plist_length = len(res.get('playlist_names'))
+        plist_pos = res.get('playlist_pos')
         if plist_length > 1 and res.get('filename') is not None:
             self.listWidgetPlaylist.item(plist_pos).setSelected(True)
             if plist_pos < plist_length:
@@ -221,7 +241,6 @@ class ClientMain(Ui_MainWindow):
         if res.get('filename') is None:
             self.actionNext.setEnabled(False)
             self.actionPrevious.setEnabled(False)
-        print(res)
     
     def seek_to_pos(self) -> None:
         slider_position = float(self.horizontalSliderPlayBack.sliderPosition())
@@ -265,10 +284,6 @@ class ClientMain(Ui_MainWindow):
         self.actionPause.setChecked(False)
         self.horizontalSliderPlayBack.setEnabled(True)
 
-    def update_remote_playlist(self) -> None:
-        plist = [self.listWidgetPlaylist.item(x).text() for x in range(self.listWidgetPlaylist.count())]
-        res = self.requester.playlist(plist, new=False, index=0).json()
-        self.temp_status_message(res)
 
     def remove_selected_from_playlist(self) -> None:
         if len(self.listWidgetPlaylist.selectedItems()) > 0:

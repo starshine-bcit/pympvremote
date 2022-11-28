@@ -19,11 +19,15 @@ def check_temp() -> None:
     TEMP_DIR.mkdir()
 
 def check_media() -> None:
+    """Checks if the media directory exists, creates it if not
+    """    
     if not MEDIA_DIR.is_dir():
         MEDIA_DIR.mkdir()
 
 
 def main():
+    """Initializes and then runs the server/api with player instance
+    """    
     check_temp()
     config = uvicorn.Config('modules.mpvapi:app',
                             port=LISTEN_PORT,

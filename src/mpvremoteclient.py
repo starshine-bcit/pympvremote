@@ -13,6 +13,8 @@ from modules.requester import Requester
 
 
 def main():
+    """Initalizes UI components, loads and display the client-side GUI
+    """    
     app = QtWidgets.QApplication([])
     main_window = QtWidgets.QMainWindow()
     requester = Requester(SERVER)
