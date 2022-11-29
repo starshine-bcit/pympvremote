@@ -188,7 +188,7 @@ def playlist(data: PlaylistItem, response: Response):
 
 @app.post('/next', status_code=fast_status.HTTP_202_ACCEPTED, response_model=GenericItem)
 def next(response: Response):
-    if player.playlist_pos != -1 and player.playlist_pos < len(player.playlist_filenames):  # type: ignore
+    if player.playlist_pos != -1 and player.playlist_pos < len(player.playlist_filenames) - 1:  # type: ignore
         player.playlist_next()
         return {'message': 'playing next playlist item'}
     else:

@@ -19,7 +19,7 @@ class StatusItem(BaseModel):
     playlist_names: list[str]
     mute: bool
     fullscreen: bool
-    repeat: bool
+    repeat: Union[bool, str]
     volume: float
     playlist_pos: int
 

@@ -325,7 +325,7 @@ class ClientMain(Ui_MainWindow):
         plist_pos = res.get('playlist_pos')
         if plist_length > 1 and res.get('filename') is not None:
             self.listWidgetPlaylist.item(plist_pos).setSelected(True)
-            if plist_pos < plist_length:
+            if plist_pos < plist_length - 1:
                 self.actionNext.setEnabled(True)
             else:
                 self.actionNext.setEnabled(False)
