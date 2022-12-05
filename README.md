@@ -58,6 +58,8 @@ This was put together fairly quickly, but I plan to include more features when t
 6. `pip install -r requirements.txt` to install the necessary Python dependencies.
 7. Adjust any relevant settings inside ./src/modules/settings/* for your setup
 
+Note: More details on how `mpv.py` looks for the mpv library can be found [here](https://github.com/jaseg/python-mpv#libmpv)
+
 #### Caution: Do not expose the api to the web. It is only meant for local use at this time.
 
 ### Usage
@@ -74,7 +76,7 @@ This was put together fairly quickly, but I plan to include more features when t
 - All buttons have tooltips which describes their function
 - Files can be played by double clicking on any of the list items
 - The play button starts the playlist you've created at the first item
-- You can paste a space separated list of URLs in the URLs tab, these will be persisted on your client machine
+- You can paste a line separated list of URLs in the URLs tab, these will be persisted on your client machine
 - Once a file is playing, the large horizontal scrollbar can be used to seek within the file
 - Toolbars can be dragged to any side of the window, if you don't like the  default position
 - Uploaded files are stored in the server's media directory, while 'streamed' files are cleared on each restart
