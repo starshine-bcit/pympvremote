@@ -29,6 +29,7 @@ def main():
     """Initializes and then runs the server/api with player instance
     """    
     check_temp()
+    check_media()
     config = uvicorn.Config('modules.mpvapi:app',
                             port=LISTEN_PORT,
                             log_level=LOG_LEVEL)
